@@ -1,0 +1,13 @@
+html {
+    scroll-snap-type: y mandatory;
+  }
+
+body{
+    margin: 0;
+}
+
+section{
+    height: 100vh;
+    max-height: 100vh;
+    scroll-snap-align: start;
+}
