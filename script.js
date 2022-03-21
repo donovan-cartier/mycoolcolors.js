@@ -68,14 +68,38 @@ let divHeight = 100 / divQuantity;
         
         function build_colors(options){
 
-        shapeHeight = 100 / options.quantity;
+        shapeHeight = $(elem).height() / options.quantity;
 
             switch(options.shape){
-                case "stripes":
+                case "stripe":
                     for(i = 0; i < options.quantity; i++){
                         newShape = document.createElement("div");
                         randColor = "#" + ((1<<24)*Math.random() | 0).toString(16);
-                        newShape.style.height = shapeHeight + "vh";
+                        newShape.style.height = shapeHeight + "px";
+                        newShape.style.backgroundColor = randColor;
+                        elem.append(newShape);
+                    }
+                    break;
+
+                case "diamond":
+                    for(i = 0; i < options.quantity; i++){
+                        newShape = document.createElement("div");
+                        randColor = "#" + ((1<<24)*Math.random() | 0).toString(16);
+                        newShape.style.height = shapeHeight + "px";
+                        newShape.style.width = shapeHeight + "px";
+                        newShape.style.backgroundColor = randColor;
+                        newShape.style.transform = 'rotate(45deg)';
+                        elem.append(newShape);
+                    }
+                    break;
+
+                case "circle":
+                    for(i = 0; i < options.quantity; i++){
+                        newShape = document.createElement("div");
+                        randColor = "#" + ((1<<24)*Math.random() | 0).toString(16);
+                        newShape.style.height = shapeHeight + "px";
+                        newShape.style.width = shapeHeight + "px";
+                        newShape.style.borderRadius = "50%";
                         newShape.style.backgroundColor = randColor;
                         elem.append(newShape);
                     }
@@ -92,7 +116,14 @@ let divHeight = 100 / divQuantity;
 })(jQuery);
 
 $("section:first-of-type").colors({
-    shape: "stripes",
+    shape: "diamond",
+    quantity: 8
+}
+)
+
+
+$("section:nth-of-type(2)>div").colors({
+    shape: "circle",
     quantity: 8
 }
 )

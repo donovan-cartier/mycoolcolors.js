@@ -11,3 +11,8 @@ section{
     max-height: 100vh;
     scroll-snap-align: start;
 }
+
+section:nth-of-type(2)>div{
+    width: 100px;
+    height: 60px;
+}
