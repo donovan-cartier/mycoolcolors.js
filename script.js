@@ -68,7 +68,16 @@ let divHeight = 100 / divQuantity;
         
         function build_colors(options){
 
-        shapeHeight = $(elem).height() / options.quantity;
+        $(elem).append("<div class='mcc-container'></div>");
+        let mccContainer = $(elem).find(".mcc-container");
+        shapeHeight = $(mccContainer).height() / options.quantity;
+
+        let columnQuantity = options.columns;
+        let currentCol = 0;
+
+        if(options.autofill == true){
+            columnQuantity = Math.round($(mccContainer).width() / shapeHeight);
+        }
 
             switch(options.shape){
                 case "stripe":
@@ -82,27 +91,47 @@ let divHeight = 100 / divQuantity;
                     break;
 
                 case "diamond":
-                    for(i = 0; i < options.quantity; i++){
-                        newShape = document.createElement("div");
-                        randColor = "#" + ((1<<24)*Math.random() | 0).toString(16);
-                        newShape.style.height = shapeHeight + "px";
-                        newShape.style.width = shapeHeight + "px";
-                        newShape.style.backgroundColor = randColor;
-                        newShape.style.transform = 'rotate(45deg)';
-                        elem.append(newShape);
+                    for(i = 0; i < columnQuantity; i++){
+                        $(mccContainer).append("<div class='mcc-column'></div>");
+                        currentCol = i+1;
+
+                        for(j = 0; j < options.quantity; j++){
+                            newShape = document.createElement("div");
+                            randColor = "#" + ((1<<24)*Math.random() | 0).toString(16);
+                            newShape.style.height = shapeHeight + "px";
+                            newShape.style.width = shapeHeight + "px";
+                            newShape.style.position = "relative";
+                            newShape.style.backgroundColor = randColor;
+                            newShape.style.transform = 'rotate(45deg)';
+                            
+                            $(mccContainer).find(".mcc-column:nth-of-type(" + currentCol + ")").append(newShape).css({
+                                'position' : 'relative',
+                                'display' : "inline-block"
+                            });
+                            
+                        }
                     }
+                   
                     break;
 
                 case "circle":
-                    for(i = 0; i < options.quantity; i++){
+                    for(i = 0; i < columnQuantity; i++){
+                        $(mccContainer).append("<div class='mcc-column'></div>");
+                        currentCol = i+1;
+                    for(j = 0; j < options.quantity; j++){
                         newShape = document.createElement("div");
                         randColor = "#" + ((1<<24)*Math.random() | 0).toString(16);
                         newShape.style.height = shapeHeight + "px";
                         newShape.style.width = shapeHeight + "px";
                         newShape.style.borderRadius = "50%";
-                        newShape.style.backgroundColor = randColor;
-                        elem.append(newShape);
-                    }
+                            newShape.style.position = "relative";
+                            newShape.style.backgroundColor = randColor;
+
+                        $(mccContainer).find(".mcc-column:nth-of-type(" + currentCol + ")").append(newShape).css({
+                            'position' : 'relative',
+                            'display' : "inline-block"
+                        });
+                    }}
                     break;
             }
         }
@@ -110,20 +139,25 @@ let divHeight = 100 / divQuantity;
 
     $.colors.defaults = {
        shape: "stripes",
-       quantity: 2
+       quantity: 2,
+       columns: 2,
+       autofill: false
     };
 
 })(jQuery);
 
 $("section:first-of-type").colors({
     shape: "diamond",
-    quantity: 8
+    quantity: 8,
+    columns: 16,
+    autofill: true
 }
 )
 
 
-$("section:nth-of-type(2)>div").colors({
+$("section:nth-of-type(2)").colors({
     shape: "circle",
-    quantity: 8
+    quantity: 8,
+    columns: 5
 }
 )
