@@ -79,6 +79,8 @@ let divHeight = 100 / divQuantity;
             columnQuantity = Math.round($(mccContainer).width() / shapeHeight);
         }
 
+        let baseColor = "#" + ((1<<24)*Math.random() | 0).toString(16);
+
             switch(options.shape){
                 case "stripe":
                     for(i = 0; i < options.quantity; i++){
@@ -97,11 +99,12 @@ let divHeight = 100 / divQuantity;
 
                         for(j = 0; j < options.quantity; j++){
                             newShape = document.createElement("div");
-                            randColor = "#" + ((1<<24)*Math.random() | 0).toString(16);
+                            // randColor = "#" + ((1<<24)*Math.random() | 0).toString(16);
                             newShape.style.height = shapeHeight + "px";
                             newShape.style.width = shapeHeight + "px";
                             newShape.style.position = "relative";
-                            newShape.style.backgroundColor = randColor;
+                            var NewColor = LightenDarkenColor(options.color, options.shadeAmount * j); 
+                            newShape.style.backgroundColor = NewColor;
                             newShape.style.transform = 'rotate(45deg)';
                             
                             $(mccContainer).find(".mcc-column:nth-of-type(" + currentCol + ")").append(newShape).css({
@@ -125,7 +128,8 @@ let divHeight = 100 / divQuantity;
                         newShape.style.width = shapeHeight + "px";
                         newShape.style.borderRadius = "50%";
                             newShape.style.position = "relative";
-                            newShape.style.backgroundColor = randColor;
+                            var NewColor = LightenDarkenColor(options.color, options.shadeAmount * j); 
+                            newShape.style.backgroundColor = options.useShade ? NewColor : options.color;
 
                         $(mccContainer).find(".mcc-column:nth-of-type(" + currentCol + ")").append(newShape).css({
                             'position' : 'relative',
@@ -141,10 +145,44 @@ let divHeight = 100 / divQuantity;
        shape: "stripes",
        quantity: 2,
        columns: 2,
-       autofill: false
+       autofill: false,
+       color: '#F06D06',
+       useShade: true,
+       shadeAmount: 20
     };
 
 })(jQuery);
+
+
+function LightenDarkenColor(col, amt) {
+  
+    var usePound = false;
+  
+    if (col[0] == "#") {
+        col = col.slice(1);
+        usePound = true;
+    }
+ 
+    var num = parseInt(col,16);
+ 
+    var r = (num >> 16) + amt;
+ 
+    if (r > 255) r = 255;
+    else if  (r < 0) r = 0;
+ 
+    var b = ((num >> 8) & 0x00FF) + amt;
+ 
+    if (b > 255) b = 255;
+    else if  (b < 0) b = 0;
+ 
+    var g = (num & 0x0000FF) + amt;
+ 
+    if (g > 255) g = 255;
+    else if (g < 0) g = 0;
+ 
+    return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
+  
+}
 
 $("section:first-of-type").colors({
     shape: "diamond",
@@ -158,6 +196,11 @@ $("section:first-of-type").colors({
 $("section:nth-of-type(2)").colors({
     shape: "circle",
     quantity: 8,
-    columns: 5
+    autofill: true,
+    color: "#42D87F",
+    shadeAmount: 10
+
 }
 )
+
+
