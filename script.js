@@ -68,87 +68,119 @@ let divHeight = 100 / divQuantity;
         
         function build_colors(options){
 
-        $(elem).append("<div class='mcc-container'></div>");
-        let mccContainer = $(elem).find(".mcc-container");
-        shapeHeight = $(mccContainer).height() / options.quantity;
+            $(elem).append("<div class='mcc-container'></div>");
+            let mccContainer = $(elem).find(".mcc-container");
+            shapeHeight = $(mccContainer).height() / options.quantity;
 
-        let columnQuantity = options.columns;
-        let currentCol = 0;
+            let columnQuantity = options.columns;
+            let currentCol = 0;
 
-        if(options.autofill == true){
-            columnQuantity = Math.round($(mccContainer).width() / shapeHeight);
-        }
+            if(options.autofill == true){
+                columnQuantity = Math.round($(mccContainer).width() / shapeHeight);
+            }
 
-        let baseColor = "#" + ((1<<24)*Math.random() | 0).toString(16);
+            let specifiedColor = options.color;
 
-            switch(options.shape){
-                case "stripe":
-                    for(i = 0; i < options.quantity; i++){
-                        newShape = document.createElement("div");
-                        randColor = "#" + ((1<<24)*Math.random() | 0).toString(16);
-                        newShape.style.height = shapeHeight + "px";
-                        newShape.style.backgroundColor = randColor;
-                        elem.append(newShape);
+            // For number of columns
+            for(i = 0; i < columnQuantity; i++){
+
+                // Append a column container
+                $(mccContainer).append("<div class='mcc-column'></div>");
+                currentCol = i+1;
+
+                // Create the specified quantity of shapes
+                for(j = 0; j < options.quantity; j++){
+
+                    if(options.color == "random"){
+                        specifiedColor = "#" + ((1<<24)*Math.random() | 0).toString(16);
+                    } else {
+                        specifiedColor = options.color;   
                     }
-                    break;
 
-                case "diamond":
-                    for(i = 0; i < columnQuantity; i++){
-                        $(mccContainer).append("<div class='mcc-column'></div>");
-                        currentCol = i+1;
+                    var newShape = document.createElement("div");
 
-                        for(j = 0; j < options.quantity; j++){
-                            newShape = document.createElement("div");
-                            // randColor = "#" + ((1<<24)*Math.random() | 0).toString(16);
+                    // Select the shape
+                    switch(options.shape){
+                        case "stripe":
+                            newShape.style.height = shapeHeight + "px";
+                            break;
+
+                        case "diamond":
                             newShape.style.height = shapeHeight + "px";
                             newShape.style.width = shapeHeight + "px";
                             newShape.style.position = "relative";
-                            var NewColor = LightenDarkenColor(options.color, options.shadeAmount * j); 
-                            newShape.style.backgroundColor = NewColor;
                             newShape.style.transform = 'rotate(45deg)';
-                            
-                            $(mccContainer).find(".mcc-column:nth-of-type(" + currentCol + ")").append(newShape).css({
-                                'position' : 'relative',
-                                'display' : "inline-block"
-                            });
-                            
-                        }
+                            break;
+        
+                        case "circle":
+                            newShape.style.height = shapeHeight + "px";
+                            newShape.style.width = shapeHeight + "px";
+                            newShape.style.borderRadius = "50%";
+                            break;
                     }
-                   
-                    break;
 
-                case "circle":
-                    for(i = 0; i < columnQuantity; i++){
-                        $(mccContainer).append("<div class='mcc-column'></div>");
-                        currentCol = i+1;
-                    for(j = 0; j < options.quantity; j++){
-                        newShape = document.createElement("div");
-                        randColor = "#" + ((1<<24)*Math.random() | 0).toString(16);
-                        newShape.style.height = shapeHeight + "px";
-                        newShape.style.width = shapeHeight + "px";
-                        newShape.style.borderRadius = "50%";
-                            newShape.style.position = "relative";
-                            var NewColor = LightenDarkenColor(options.color, options.shadeAmount * j); 
-                            newShape.style.backgroundColor = options.useShade ? NewColor : options.color;
+                    newShape.style.position = "relative";
 
+                    if(options.shadeDirection == "horizontal"){
+                        var NewColor = LightenDarkenColor(options.color, options.shadeAmount * currentCol);
+                    } else {
+                        var NewColor = LightenDarkenColor(options.color, options.shadeAmount * j); 
+                    }
+                    newShape.style.backgroundColor = options.useShade ? NewColor : specifiedColor;
+
+                    if(options.shape == "stripe"){
+                        $(mccContainer).find(".mcc-column:nth-of-type(" + currentCol + ")").append(newShape).css({
+                            'position' : 'relative',
+                            'display' : "inline-block",
+                            'width' : $(mccContainer).width() / columnQuantity
+                        });
+                    } else {
                         $(mccContainer).find(".mcc-column:nth-of-type(" + currentCol + ")").append(newShape).css({
                             'position' : 'relative',
                             'display' : "inline-block"
                         });
-                    }}
-                    break;
+                    }
+
+                    
+                switch(options.align){
+                    case "center":
+                        $(mccContainer).css({
+                            "display" : "flex",
+                            "justify-content" : "center"
+                        })
+                        break;
+
+                    case "left":
+                        $(mccContainer).css({
+                            "display" : "flex",
+                            "justify-content" : "flex-start"
+                        })
+                        break;
+
+                    case "right":
+                        $(mccContainer).css({
+                            "display" : "flex",
+                            "justify-content" : "flex-end"
+                        })
+                        break;
+                }
+
+                }
             }
         }
     };
 
+    // DEFAULTS
     $.colors.defaults = {
-       shape: "stripes",
+       shape: "stripe",
        quantity: 2,
        columns: 2,
        autofill: false,
        color: '#F06D06',
        useShade: true,
-       shadeAmount: 20
+       shadeDirection: 'vertical',
+       shadeAmount: 20,
+       align: "center"
     };
 
 })(jQuery);
@@ -188,19 +220,35 @@ $("section:first-of-type").colors({
     shape: "diamond",
     quantity: 8,
     columns: 16,
-    autofill: true
+    autofill: true,
+    useShade: true,
+    // color: "#0000DD",
+    // shadeDirection: 'horizontal'
 }
 )
 
 
 $("section:nth-of-type(2)").colors({
-    shape: "circle",
-    quantity: 8,
-    autofill: true,
-    color: "#42D87F",
-    shadeAmount: 10
+    shape: "stripe",
+    quantity: 2,
+    autofill: false,
+    // color: "",
+    shadeAmount: 20,
+    columns: 3,
+    useShade: true
 
 }
 )
 
+$("section:nth-of-type(3)").colors({
+    shape: "circle",
+    quantity: 2,
+    autofill: false,
+    // color: "",
+    shadeAmount: 20,
+    columns: 3,
+    useShade: true,
+    // align: "center"
+}
+)
 
